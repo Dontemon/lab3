@@ -7,7 +7,7 @@
 #include <QTreeView>
 #include <QTableView>
 #include <QBoxLayout>
-#include "themewidget.h"
+#include "diagrams.h"
 
 class MainWindow : public QMainWindow
 {
