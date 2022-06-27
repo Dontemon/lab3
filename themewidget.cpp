@@ -51,7 +51,7 @@
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
 #include <QFileDialog>
-#include "diagrams.h"
+#include "themewidget.h"
 
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
