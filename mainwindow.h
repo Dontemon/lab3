@@ -7,22 +7,22 @@
 #include <QTreeView>
 #include <QTableView>
 #include <QBoxLayout>
-#include "diagrams.h"
+#include "themewidget.h"
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 private slots:
-	void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
+    void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
 
 public:
-	MainWindow(QWidget *parent = 0);
-	~MainWindow();
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 private:
-	QFileSystemModel *fileModel;
-	QFileSystemModel *dirModel;
-	QTreeView *treeView;
-	QTableView *tableView;
+    QFileSystemModel *fileModel;
+    QFileSystemModel *dirModel;
+    QTreeView *treeView;
+    QTableView *tableView;
     ThemeWidget *themeWidget;
     QVBoxLayout *tableLayout;
     QHBoxLayout *tableButtonLayout;
@@ -31,3 +31,4 @@ private:
 };
 
 #endif // MAINWINDOW_H
+

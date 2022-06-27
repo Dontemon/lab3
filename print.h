@@ -17,21 +17,21 @@ enum Types_of_Charts
 class I_Print
 {   
 public:
-    virtual QChartView create_Chart(const DataList& dataList, bool notColored = false) = 0;
+    virtual QChartView create_Chart(const DataList& dataList, bool blackAndWhite = false) = 0;
     I_Print(){}
 };
 
 class I_Print_bar: public I_Print
 {
 public:
-    virtual QChartView create_Chart( const DataList& Data, bool notColored = false);
+    virtual QChartView create_Chart( const DataList& Data, bool blackAndWhite = false);
     I_Print_bar(){}
 };
 
 class I_Print_Pie: public I_Print
 {
 public:
-    virtual QChartView create_Chart(const DataList& Data, bool notColored = false);
+    virtual QChartView create_Chart(const DataList& Data, bool blackAndWhite = false);
     I_Print_Pie(){}
 };
 

@@ -56,16 +56,15 @@
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
-    m_listCount(3),
+    m_listCount(1),
     m_valueMax(10),
-    m_valueCount(5),
+    m_valueCount(10),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_typeComboBox(createTypeBox()),
     m_notColoredCheckBox(new QCheckBox("Черно-белый график")),
     m_printButton(new QPushButton("Печать графика"))
 {
     connectSignals();
-    // create layout
     QVBoxLayout *baseLayout = new QVBoxLayout();
     QHBoxLayout *settingsLayout = new QHBoxLayout();
     settingsLayout->addWidget(new QLabel("Выберите тип диаграммы:"));
@@ -77,7 +76,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     //create chart
 
-    chartView = new QChartView(createAreaChart());
+    chartView = new QChartView();
 
     baseLayout->addWidget(chartView);
 
@@ -90,6 +89,15 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
 ThemeWidget::~ThemeWidget()
 {
+}
+
+void ThemeWidget::connectSignals()
+{
+    connect(m_typeComboBox,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &ThemeWidget::updateUI);
+    connect(m_notColoredCheckBox, &QCheckBox::toggled, this, &ThemeWidget::updateUI);
+    connect(m_printButton, SIGNAL(clicked()), this, SLOT(openFileDialogWindow()));
 }
 
 void ThemeWidget::openFileDialogWindow()
@@ -111,8 +119,6 @@ void ThemeWidget::openFileDialogWindow()
     {
         fileNames = fileDialog->selectedFiles();
     }
-    //for(auto tmp:fileNames)
-        //qDebug()<<tmp<<endl;
 }
 
 
@@ -121,49 +127,9 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
     DataTable dataTable;
 
     // set seed for random stuff
-    srand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
     // generate random data
-    for (int i(0); i < listCount; i++) {
-        DataList dataList;
-        qreal yValue(0);
-        for (int j(0); j < valueCount; j++) {
-            yValue = yValue + (qreal)(rand() % valueMax) / (qreal) valueCount;
-            QPointF value((j + (qreal) rand() / (qreal) RAND_MAX) * ((qreal) m_valueMax / (qreal) valueCount),
-                          yValue);
-            QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
-            dataList << Data(value, label);
-        }
-        dataTable << dataList;
-    }
-
-    /*
-    DataTable dataTable;
-
-    QSqlDatabase sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName("BLOOD_SUGAR.sqlite");
-    if (sdb.open())
-    {
-        qDebug() << "BD open\n";
-        QSqlQuery query("SELECT VALUE FROM BLOOD_SUGAR", sdb);
-        int index = 0;
-        DataList dataList;
-        while (query.next() && (index < 10))
-        {
-            QString temp = query.value(0).toString();
-            QPointF value(temp, index);
-
-            dataList << Data(value, "BLOOD_SUGAR");
-
-            index++;
-        }
-        dataTable << dataList;
-    }
-    else
-    {
-        qDebug() << "BD not open\n";
-    }
-
     for (int i(0); i < listCount; i++) {
         DataList dataList;
         qreal yValue(0);
@@ -176,7 +142,6 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
         }
         dataTable << dataList;
     }
-*/
 
     return dataTable;
 }
@@ -185,39 +150,46 @@ QComboBox *ThemeWidget::createTypeBox() const
 {
     // type layout
     QComboBox *themeComboBox = new QComboBox();
-    themeComboBox->addItem("Bar", TypeThemeWidget::Bar);
-    themeComboBox->addItem("Pie", TypeThemeWidget::Pie);
+    themeComboBox->addItem("Bar", Types_of_Charts::Bar);
+    themeComboBox->addItem("Pie", Types_of_Charts::pie);
     return themeComboBox;
 }
 
-
-
-
-
 void ThemeWidget::updateUI()
 {
-    TypeThemeWidget typeChart = static_cast<TypeThemeWidget>(
-                m_typeComboBox->itemData(m_typeComboBox->currentIndex()).toInt());
+//    TypeThemeWidget typeChart = static_cast<TypeThemeWidget>(
+//                m_typeComboBox->itemData(m_typeComboBox->currentIndex()).toInt());
 
-//    QBrush brush;
-//    if (m_notColoredCheckBox->isChecked()) {
-//        QRadialGradient gradient(50, 50, 50, 50, 50);
-//        gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
-//        gradient.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
-
-//        brush = QBrush(gradient);
-//    }
-//    else
+//    switch (typeChart)
 //    {
-//        QRadialGradient gradient(50, 50, 50, 50, 50);
-//        gradient.setColorAt(0, QColor::fromRgbF(0, 0, 1, 1));
-//        gradient.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
-
-//        brush = QBrush(gradient);
+//    case TypeThemeWidget::Area :
+//        chartView->setChart(createAreaChart(m_notColoredCheckBox->isChecked()));
+//        break;
+//    case TypeThemeWidget::Bar :
+//        chartView->setChart(createBarChart(m_notColoredCheckBox->isChecked()));
+//        break;
+//    case TypeThemeWidget::Line :
+//        chartView->setChart(createLineChart(m_notColoredCheckBox->isChecked()));
+//        break;
+//    case TypeThemeWidget::Pie :
+//        chartView->setChart(createPieChart(m_notColoredCheckBox->isChecked()));
+//        break;
+//    case TypeThemeWidget::Spline :
+//        chartView->setChart(createSplineChart(m_notColoredCheckBox->isChecked()));
+//        break;
+//    case TypeThemeWidget::Scatter :
+//        chartView->setChart(createScatterChart(m_notColoredCheckBox->isChecked()));
+//        break;
 //    }
+}
 
-
-    //chartView->chart()->Series["Series 0"];
+void Chart::print_Data(bool blackAndWhite)
+{
+//    *view = gContainer.getObject<I_Print>()->create_Chart(data, notColored);
 
 }
 
+void Chart::read_Data(const QString& filePath)
+{
+//    data = gContainer.getObject<I_Reader>()->read_Data(filePath);
+}

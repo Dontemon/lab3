@@ -1,20 +1,23 @@
 #include "print.h"
 
-I_Print::create_Chart(QChartView &chart_View, const DataList& Data, bool notColored = false)
+QChartView* I_Print_bar::create_Chart(const DataList& data, bool blackAndWhite)
 {
+    QChartView* chart_View = new QChartView();
+
     QChart *chart = new QChart();
     chart->setTitle("Bar chart");
 
-    QStackedBarSeries *series = new QStackedBarSeries(chart);
-    for (int i(0); i < m_dataTable.count(); i++)
-    {
-        QBarSet *set = new QBarSet("Bar set " + QString::number(i));
-        for (const Data &data_Elem : Data)
+   QBarSeries *series = new QBarSeries(chart);
+
+//    QStackedBarSeries *series = new QStackedBarSeries(chart);
+
+        QBarSet *set = new QBarSet("Bar");
+        for (const Data &data_Elem : data)
             *set << data_Elem.first.y();
 
-        if (notColored)
+        if (blackAndWhite)
         {
-            QLinearGradient gradient(0, 0, this->width(), this->height());
+            QLinearGradient gradient(0, 0, 1000, 1000);
             gradient.setColorAt(0, Qt::black);
             gradient.setColorAt(1, Qt::white);
 
@@ -22,28 +25,32 @@ I_Print::create_Chart(QChartView &chart_View, const DataList& Data, bool notColo
             set->setBrush(brush);
         }
         series->append(set);
-    }
+
     chart->addSeries(series);
     chart->createDefaultAxes();
 
-    chart_View.setChart(chart);
+    chart_View->setChart(chart);
+
+           return chart_View;
 
 }
 
-QChartView I_Print::create_Chart(const DataList& Data, bool notColored = false)
+QChartView* I_Print::create_Chart(const DataList& data, bool blackAndWhite)
 {
-    //QChart *ThemeWidget::createPieChart(bool notColored) const
-        QChart *chart = new QChart();
-        chart->setTitle("Pie chart");
-        qreal pieSize = 1.0 / m_dataTable.count();
 
-            for (const Data &data_Elem : Data)
+    QChartView* chart_View = new QChartView();
+    QChart *chart = new QChart();
+        chart->setTitle("Pie chart");
+
+        QPieSeries *series = new QPieSeries(chart);
+
+            for (const Data &data_Elem : data)
             {
                 QPieSlice *slice = series->append(data_Elem.second, data_Elem.first.y());
 
-                if (notColored)
+                if (blackAndWhite)
                 {
-                    QLinearGradient gradient(0, 0, chartView->height(), chartView->width());
+                    QLinearGradient gradient(0, 0, 1000, 1000);
                     gradient.setColorAt(0, Qt::black);
                     gradient.setColorAt(1, Qt::white);
 
@@ -57,5 +64,7 @@ QChartView I_Print::create_Chart(const DataList& Data, bool notColored = false)
             series->setVerticalPosition(0.5);
             chart->addSeries(series);
 
-       chart_View.setChart(chart);
+       chart_View->setChart(chart);
+
+       return chart_View;
 }

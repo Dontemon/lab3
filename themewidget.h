@@ -34,13 +34,18 @@
 #include <QtCharts/QChartGlobal>
 #include <QPushButton>
 
+#include "IOC.h"
+#include "print.h"
+#include "reader.h"
 
-QT_CHARTS_BEGIN_NAMESPACE
+
+QT_BEGIN_NAMESPACE
 class QComboBox;
 class QCheckBox;
-QT_CHARTS_END_NAMESPACE
+QT_END_NAMESPACE
 
 QT_CHARTS_BEGIN_NAMESPACE
+
 class QChartView;
 class QChart;
 QT_CHARTS_END_NAMESPACE
@@ -61,13 +66,6 @@ public:
 
 };
 
-enum TypeThemeWidget
-{
-    Bar,
-    Pie
-
-};
-
 
 class ThemeWidget: public QWidget
 {
@@ -85,9 +83,6 @@ private:
     QComboBox *createTypeBox() const;
     void connectSignals();
 public:
-    QChart *createBarChart() const;
-    QChart *createPieChart() const;
-
 
 
 
@@ -102,6 +97,17 @@ private:
     QPushButton *m_printButton;
 
     QChartView *chartView;
+};
+
+class Chart
+{
+
+    QChartView* view;
+
+public:
+    Chart(QChartView* v) { view = v; }
+    void print_Data(bool blackAndWhite = false);
+    void read_Data(const QString& filePath);
 };
 
 #endif /* THEMEWIDGET_H */
