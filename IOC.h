@@ -20,7 +20,8 @@ using namespace std;
 и экземпляр статической локальной переменной для каждого типа,
 к которому можно обратиться, вызвав метод GetTypeID.
 */
-
+namespace IOC
+{
 class IOCContainer
 
 {
@@ -89,7 +90,7 @@ public:
 
     template<typename T>
 
-    std::shared_ptr<T> GetObject()
+    std::shared_ptr<T> getObject()
 
     {
 
@@ -108,7 +109,7 @@ public:
     template<typename TInterface, typename ...TS>
     void RegisterFunctor(std::function<std::shared_ptr<TInterface>(std::shared_ptr<TS> ...ts)> functor)
     {
-        factories[GetTypeID<TInterface>()] = std::make_shared<CFactory<TInterface>>([=] {return functor(GetObject<TS>()...); });
+        factories[GetTypeID<TInterface>()] = std::make_shared<CFactory<TInterface>>([=] {return functor(getObject<TS>()...); });
     }
 
     //Регистрация экземпляра объекта
@@ -144,10 +145,11 @@ public:
     template<typename TInterface, typename TConcrete, typename ...TArguments>
     void RegisterInstance()
     {
-        RegisterInstance<TInterface>(std::make_shared<TConcrete>(GetObject<TArguments>()...));
+        RegisterInstance<TInterface>(std::make_shared<TConcrete>(getObject<TArguments>()...));
     }
 };
 
-IOCContainer gContainer;
+//IOCContainer gContainer;
+}
 
 #endif // IOC_H
