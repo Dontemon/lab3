@@ -1,38 +1,35 @@
 #ifndef PRINT_H
 #define PRINT_H
 
-#include "IOC.h"
+#include "reader.h"
 #include "QtCharts"
-
-using Data = QPair<QPointF, QString>;
-using DataList = QList<Data>;
 
 enum Types_of_Charts
 {
-    Pie,
-    Bar,
+    pie,
+    bar,
 };
 
 
-class I_Print
+class I_Print//фабрика для вывода разных диаграмм
 {   
 public:
-    virtual QChartView create_Chart(const DataList& dataList, bool blackAndWhite = false) = 0;
+    virtual void create_Chart(QChartView& chartView, const DataList& data, bool blackAndWhite = false) = 0;
     I_Print(){}
 };
 
-class I_Print_bar: public I_Print
+class Print_Bar: public I_Print// вывод диаграммы bar
 {
 public:
-    virtual QChartView create_Chart( const DataList& Data, bool blackAndWhite = false);
-    I_Print_bar(){}
+    virtual void create_Chart(QChartView& chartView, const DataList& data, bool blackAndWhite = false);
+    Print_Bar(){}
 };
 
-class I_Print_Pie: public I_Print
+class Print_Pie: public I_Print// вывод диаграммы pie
 {
 public:
-    virtual QChartView create_Chart(const DataList& Data, bool blackAndWhite = false);
-    I_Print_Pie(){}
+    virtual void create_Chart(QChartView& chartView, const DataList& data, bool blackAndWhite = false);
+    Print_Pie(){}
 };
 
 #endif // PRINT_H
