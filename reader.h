@@ -7,7 +7,7 @@ using Data = QPair<QPointF, QString>;
 using DataList = QList<Data>;
 
 
-class I_Reader//фабрика для считывание информации из разных файлов
+class I_Reader//Абстрактный класс для считывания информации из разных файлов
 {
 public:
     virtual DataList read_Data(const QString& filePath) = 0;

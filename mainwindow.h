@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -21,7 +21,7 @@ public:
     ~MainWindow();
 private:
     QFileSystemModel *fileModel;
-    QTableView *tableView;
+    QTableView  *tableView;
     ChartWidget *chartWidget;
     QVBoxLayout *tableLayout;
     QHBoxLayout *tableButtonLayout;

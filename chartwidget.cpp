@@ -56,37 +56,33 @@
 
 ChartWidget::ChartWidget(QWidget *parent) :
     QWidget(parent),
-    typeComboBox(createTypeBox()),
-    blackAndWhiteCheckBox(new QCheckBox("Черно-белый график")),
-    printButton(new QPushButton("Печать графика"))
+    typeComboBox(createTypeBox()),//создаём кнопку для выбора графика
+    blackAndWhiteCheckBox(new QCheckBox("Черно-белый график")),//создаём кнопку-галочку для чёрно-белого графика
+    printButton(new QPushButton("Печать графика"))//кнопка для печати графика
 {
     connectSignals();
-    QVBoxLayout *baseLayout = new QVBoxLayout();
+    QVBoxLayout *baseLayout = new QVBoxLayout();//создаём два слоя
     QHBoxLayout *settingsLayout = new QHBoxLayout();
-    settingsLayout->addWidget(new QLabel("Выберите тип диаграммы:"));
+    settingsLayout->addWidget(new QLabel("Выберите тип диаграммы:"));//добавляем кнопки на слой
     settingsLayout->addWidget(typeComboBox);
     settingsLayout->addWidget(blackAndWhiteCheckBox);
     settingsLayout->addWidget(printButton);
-    settingsLayout->addStretch();
-    baseLayout->addLayout(settingsLayout);
+    settingsLayout->addStretch();//
+    baseLayout->addLayout(settingsLayout);//помещаем слой настроек на базовый
 
-    //create chart
-    chart = new Chart();
+    chart = new Chart();// создаём диаграмму
 
-    baseLayout->addWidget(chart->getChartView());
+    baseLayout->addWidget(chart->getChartView());//добавляем диаграмму на слой
 
-    setLayout(baseLayout);
+    setLayout(baseLayout);//устанавливаем базовый слой
 
-
-
-    // Set defaults
-    blackAndWhiteCheckBox->setChecked(false);
-    updateUI();
+    blackAndWhiteCheckBox->setChecked(false);//устанавливаем поумолчанию цветной график
+    updateUI();// обновляем график
 }
 
-ChartWidget::~ChartWidget() {}
+ChartWidget::~ChartWidget() {}//деструктор
 
-void ChartWidget::connectSignals()
+void ChartWidget::connectSignals()// соединяем сигналы
 {
     connect(typeComboBox,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -99,11 +95,13 @@ QString ChartWidget::getPathToSavePdf()
 {
     QFileDialog *fileDialog = new QFileDialog(this);
              // определить заголовок файла
-    fileDialog-> setWindowTitle (tr("Сохранить как"));
+    //fileDialog-> setWindowTitle (tr ("Открыть изображение"));
              // Установить путь к файлу по умолчанию
     fileDialog->setDirectory(".");
              // Установить фильтр файлов
     fileDialog->setNameFilter(tr("pdf(*.pdf)"));
+             // Настройка позволяет выбрать несколько файлов, по умолчанию используется только один файл QFileDialog :: ExistingFiles
+    fileDialog->setFileMode(QFileDialog::ExistingFiles);
              // Установить режим просмотра
     fileDialog->setViewMode(QFileDialog::Detail);
              // выводим путь ко всем выбранным файлам
@@ -117,47 +115,47 @@ QString ChartWidget::getPathToSavePdf()
 
 void ChartWidget::printToPdf()
 {
-    QString fileName = getPathToSavePdf();
+    QString fileName = getPathToSavePdf();//находим путь
 
-    QPdfWriter writer(fileName + ".pdf");
+    QPdfWriter writer(fileName + ".pdf");//устанавливаем формат файла пдф
 
     writer.setPageSize(QPagedPaintDevice::A4);//Устанавливаем размер страницы
 
     QPainter painter(&writer);
 
-    chart->getChartView()->render(&painter);
+    chart->getChartView()->render(&painter);//загружаем полученный пдф
     painter.end();
 }
 
 
 
-QComboBox *ChartWidget::createTypeBox() const
+QComboBox *ChartWidget::createTypeBox() const//метод для создания переключателя между диаграммами
 {
     // type layout
-    QComboBox *themeComboBox = new QComboBox();
-    themeComboBox->addItem("Bar", Types_of_Charts::bar);
-    themeComboBox->addItem("Pie", Types_of_Charts::pie);
+    QComboBox *themeComboBox = new QComboBox();//создаём сам переключатель
+    themeComboBox->addItem("Bar", Types_of_Charts::bar);//добавляем вариант диаграммы Bar
+    themeComboBox->addItem("Pie", Types_of_Charts::pie);//добавляем вариант диаграммы Pie
     return themeComboBox;
 }
 
 void ChartWidget::updateData(const QString& filePath)
 {
-    chart->read_Data(filePath);
-    updateUI();
+    chart->read_Data(filePath);//считываем из файла данные
+    updateUI();//выводим данные на диаграмму
 }
 
-void ChartWidget::updateUI()
+void ChartWidget::updateUI()//меняем диаграмму в зависимости от выбранного переключателя
 {
     Types_of_Charts typeChart = static_cast<Types_of_Charts>(
                 typeComboBox->itemData(typeComboBox->currentIndex()).toInt());
 
     switch (typeChart)
     {
-    case Types_of_Charts::bar :
+    case Types_of_Charts::bar ://если выбран bar то выводим диаграмму bar
         IOC::IOCContainer::instance().RegisterFactory<I_Print, Print_Bar>();
         chart->print_Data(blackAndWhiteCheckBox->isChecked());
         break;
-    case Types_of_Charts::pie :
+    case Types_of_Charts::pie ://если выбран pie то выводим диаграмму pie 
         IOC::IOCContainer::instance().RegisterFactory<I_Print, Print_Pie>();
         chart->print_Data(blackAndWhiteCheckBox->isChecked());
         break;
@@ -165,12 +163,12 @@ void ChartWidget::updateUI()
 
 }
 
-void Chart::print_Data(bool blackAndWhite)
+void Chart::print_Data(bool blackAndWhite)//отрисовываем диаграмму в зависимости чёрно-белая она или нет
 {
     IOC::IOCContainer::instance().getObject<I_Print>()->create_Chart(view, data, blackAndWhite);
 }
 
-void Chart::read_Data(const QString& filePath)
+void Chart::read_Data(const QString& filePath)//считываем информацию из файла
 {
     data = IOC::IOCContainer::instance().getObject<I_Reader>()->read_Data(filePath);
 }

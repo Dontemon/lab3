@@ -41,10 +41,9 @@
 int IOC::IOCContainer::s_typeId = 121;
 
 MainWindow::MainWindow(QWidget *parent)
-    : //QWidget(parent)
-      QMainWindow(parent)
+    :QMainWindow(parent)
 {
-    buttonChangeFolder = new QPushButton("Change folder");
+    buttonChangeFolder = new QPushButton("Change folder");//кнопка выбора другой папки для таблицы
 
     chartWidget = new ChartWidget();
     //Устанавливаем размер главного окна
@@ -55,37 +54,31 @@ MainWindow::MainWindow(QWidget *parent)
     // Определим  файловой системы:
 
     fileModel = new QFileSystemModel(this);
-    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
+    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files);//устанавливаем фильтр для файлов
 
-    fileModel->setRootPath(homePath);
+    fileModel->setRootPath(homePath);//устанавливаем начальное положение папки
 
-    QSplitter *splitter = new QSplitter();
-//    QVBoxLayout *fileTableLayout = new QVBoxLayout();
-    tableView = new QTableView;
+    QSplitter *splitter = new QSplitter();//создаём разделитель
+    tableView = new QTableView;//создаём представление таблицы
     tableView->setModel(fileModel);
-//    fileTableLayout->addWidget(tableView);
-//    fileTableLayout->addWidget(buttonChangeFolder);
-    splitter->addWidget(buttonChangeFolder);
-    splitter->addWidget(tableView);
+    splitter->addWidget(buttonChangeFolder);//добавляем кнопку
+    splitter->addWidget(tableView);//добавляем в разделённое окно таблицу с файлами
 
 
-    splitter->addWidget(chartWidget);
+    splitter->addWidget(chartWidget);//добавляем диаграмму 
     setCentralWidget(splitter);
 
     tableView->verticalHeader()->resizeSection(0, 2000);
-    //Выполняем соединения слота и сигнала который вызывается когда осуществляется выбор элемента в TreeView
+    //Выполняем соединения слота и сигнала который вызывается когда осуществляется выбор элемента в TableView
     connect(tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
             this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
-
     connect(buttonChangeFolder, SIGNAL(clicked()), this, SLOT(openFileDialogWindow()));
 }
-//Слот для обработки выбора элемента в TreeView
+
+
+//Слот для обработки выбора элемента в TableView
 //выбор осуществляется с помощью курсора
-
-
 void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    //Q_UNUSED(selected);
     Q_UNUSED(deselected);
     QModelIndex index = tableView->selectionModel()->currentIndex();
     QModelIndexList indexs =  selected.indexes();
@@ -93,33 +86,33 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 
     // Размещаем инфо в statusbar относительно выделенного модельного индекса
 
-    if (indexs.count() >= 1) {
+    if (indexs.count() >= 1) {//для отслеживания пути к нужному файлу
         QModelIndex ix =  indexs.constFirst();
         filePath = fileModel->filePath(ix);
         this->statusBar()->showMessage("Выбранный путь : " + fileModel->filePath(indexs.constFirst()));
     }
 
-    QString typeFile = filePath;
-    typeFile.remove(0, typeFile.indexOf('.'));
-    if (typeFile == ".sqlite")
+    QString typeFile = filePath;//создаём строку содержащую путь до нужного файла
+    typeFile.remove(0, typeFile.indexOf('.'));//удаляем всё кроме формат файла
+    if (typeFile == ".sqlite")//если формат sqlite
     {
         IOC::IOCContainer::instance().RegisterFactory<I_Reader, Reader_SQL_lite>();
-        chartWidget->updateData(filePath);
+        chartWidget->updateData(filePath);//передаём новый файл для диаграммы
     }
-    if (typeFile == ".json")
+    if (typeFile == ".json")//если формат json
     {
         IOC::IOCContainer::instance().RegisterFactory<I_Reader, Reader_JSON>();
-        chartWidget->updateData(filePath);
+        chartWidget->updateData(filePath);//передаём новый файл для диаграммы
     }
 
 }
 
-void MainWindow::openFileDialogWindow()
+void MainWindow::openFileDialogWindow()//диалоговое окно для выбора новой папки
 {
-    QFileDialog fileDialog(this);
+    QFileDialog fileDialog(this);//создаём диалоговое окно
 
-    fileDialog.setFileMode(QFileDialog::Directory);
-    fileDialog.setDirectory(QDir::homePath());
+    fileDialog.setFileMode(QFileDialog::Directory);//устанавливаем режим работы с файлами
+    fileDialog.setDirectory(QDir::homePath());//устанавилваем начальное положение
 
     QString filePath;
     if(fileDialog.exec())

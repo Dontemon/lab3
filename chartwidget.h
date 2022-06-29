@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -59,7 +59,7 @@ class ChartWidget: public QWidget
     Q_OBJECT
 public:
     explicit ChartWidget(QWidget *parent = nullptr);
-    ~ChartWidget();
+    ~ChartWidget();//деструктор
 
     void updateData(const QString& filePath);
 
@@ -86,9 +86,9 @@ class Chart
     DataList data;
 
 public:
-    Chart() {}
-    void print_Data(bool blackAndWhite = false);
-    void read_Data(const QString& filePath);
+    Chart() {}//конструктор поумолчанию
+    void print_Data(bool blackAndWhite = false);//вывод информации на диаграмму 
+    void read_Data(const QString& filePath);//считывание информации из документа
 
     QChartView* getChartView() { return &view; }
 };

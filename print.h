@@ -11,7 +11,7 @@ enum Types_of_Charts
 };
 
 
-class I_Print//фабрика для вывода разных диаграмм
+class I_Print//Абстрактный класс для вывода разных диаграмм
 {   
 public:
     virtual void create_Chart(QChartView& chartView, const DataList& data, bool blackAndWhite = false) = 0;
