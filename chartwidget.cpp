@@ -67,7 +67,7 @@ ChartWidget::ChartWidget(QWidget *parent) :
     settingsLayout->addWidget(typeComboBox);
     settingsLayout->addWidget(blackAndWhiteCheckBox);
     settingsLayout->addWidget(printButton);
-    settingsLayout->addStretch();//
+    settingsLayout->addStretch();//добавляем разделитель на слой
     baseLayout->addLayout(settingsLayout);//помещаем слой настроек на базовый
 
     chart = new Chart();// создаём диаграмму
@@ -84,11 +84,12 @@ ChartWidget::~ChartWidget() {}//деструктор
 
 void ChartWidget::connectSignals()// соединяем сигналы
 {
+    //соединяем изменения типа диаграммы и обовление диаграммы
     connect(typeComboBox,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &ChartWidget::updateUI);
-    connect(blackAndWhiteCheckBox, &QCheckBox::toggled, this, &ChartWidget::updateUI);
-    connect(printButton, SIGNAL(clicked()), this, SLOT(printToPdf()));
+    connect(blackAndWhiteCheckBox, &QCheckBox::toggled, this, &ChartWidget::updateUI); //соединяем изменения цвета диаграммы и обовление диаграммы
+    connect(printButton, SIGNAL(clicked()), this, SLOT(printToPdf()));  //соединяем нажатие на кнопку печати со слотом печати pdf файла
 }
 
 QString ChartWidget::getPathToSavePdf()
@@ -146,18 +147,18 @@ void ChartWidget::updateData(const QString& filePath)
 
 void ChartWidget::updateUI()//меняем диаграмму в зависимости от выбранного переключателя
 {
-    Types_of_Charts typeChart = static_cast<Types_of_Charts>(
+    Types_of_Charts typeChart = static_cast<Types_of_Charts>( //получаем выбранный тип диаграммы
                 typeComboBox->itemData(typeComboBox->currentIndex()).toInt());
 
     switch (typeChart)
     {
-    case Types_of_Charts::bar ://если выбран bar то выводим диаграмму bar
+    case Types_of_Charts::bar ://если выбран bar, то помещаем в контейнер принтер bar
         IOC::IOCContainer::instance().RegisterFactory<I_Print, Print_Bar>();
-        chart->print_Data(blackAndWhiteCheckBox->isChecked());
+        chart->print_Data(blackAndWhiteCheckBox->isChecked());//и перерисовывваем диаграмму
         break;
-    case Types_of_Charts::pie ://если выбран pie то выводим диаграмму pie 
+    case Types_of_Charts::pie ://если выбран pie, то помещаем в контейнер принтер pie
         IOC::IOCContainer::instance().RegisterFactory<I_Print, Print_Pie>();
-        chart->print_Data(blackAndWhiteCheckBox->isChecked());
+        chart->print_Data(blackAndWhiteCheckBox->isChecked());//и перерисовывваем диаграмму
         break;
     }
 
@@ -165,10 +166,10 @@ void ChartWidget::updateUI()//меняем диаграмму в зависим�
 
 void Chart::print_Data(bool blackAndWhite)//отрисовываем диаграмму в зависимости чёрно-белая она или нет
 {
-    IOC::IOCContainer::instance().getObject<I_Print>()->create_Chart(view, data, blackAndWhite);
+    IOC::IOCContainer::instance().getObject<I_Print>()->create_Chart(view, data, blackAndWhite);// получаем из контейнера нужный принтер и перерисовываем диаграмму
 }
 
 void Chart::read_Data(const QString& filePath)//считываем информацию из файла
 {
-    data = IOC::IOCContainer::instance().getObject<I_Reader>()->read_Data(filePath);
+    data = IOC::IOCContainer::instance().getObject<I_Reader>()->read_Data(filePath);// получаем из контейнера нужный ридер и обновляем данные
 }

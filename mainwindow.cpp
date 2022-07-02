@@ -78,32 +78,41 @@ MainWindow::MainWindow(QWidget *parent)
 
 //Слот для обработки выбора элемента в TableView
 //выбор осуществляется с помощью курсора
-void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected)
+void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected)//
+{
     Q_UNUSED(deselected);
-    QModelIndex index = tableView->selectionModel()->currentIndex();
-    QModelIndexList indexs =  selected.indexes();
+    QModelIndexList indexs =  selected.indexes();//получаем индексы выделенных элементов в таблице
     QString filePath = "";
 
     // Размещаем инфо в statusbar относительно выделенного модельного индекса
 
-    if (indexs.count() >= 1) {//для отслеживания пути к нужному файлу
+    if (indexs.count() >= 1)//если есть выделенные элементы в таблице
+    {
         QModelIndex ix =  indexs.constFirst();
-        filePath = fileModel->filePath(ix);
+        filePath = fileModel->filePath(ix);//получаем путь к выделенному файлу
         this->statusBar()->showMessage("Выбранный путь : " + fileModel->filePath(indexs.constFirst()));
     }
 
     QString typeFile = filePath;//создаём строку содержащую путь до нужного файла
     typeFile.remove(0, typeFile.indexOf('.'));//удаляем всё кроме формат файла
-    if (typeFile == ".sqlite")//если формат sqlite
+    if (typeFile == ".sqlite")//если формат sqlite, помещаем в конейнер ридер для sqlite и обновляем диаграмму
     {
         IOC::IOCContainer::instance().RegisterFactory<I_Reader, Reader_SQL_lite>();
-        chartWidget->updateData(filePath);//передаём новый файл для диаграммы
+        chartWidget->updateData(filePath);
     }
-    if (typeFile == ".json")//если формат json
-    {
-        IOC::IOCContainer::instance().RegisterFactory<I_Reader, Reader_JSON>();
-        chartWidget->updateData(filePath);//передаём новый файл для диаграммы
-    }
+    else 
+         if (typeFile == ".json")//если формат json, помещаем в конейнер ридер для json и обновляем диаграмму
+         {
+            IOC::IOCContainer::instance().RegisterFactory<I_Reader, Reader_JSON>();
+            chartWidget->updateData(filePath);
+         }
+         else//если выделенный файл содержит не поддерживаемый тип, то выдаём ошибку
+         {
+             QMessageBox messageBox;
+             messageBox.setText("Выбранный файл не поддерживается: " + typeFile);
+             messageBox.exec();
+         }
+
 
 }
 
@@ -115,16 +124,12 @@ void MainWindow::openFileDialogWindow()//диалоговое окно для в
     fileDialog.setDirectory(QDir::homePath());//устанавилваем начальное положение
 
     QString filePath;
-    if(fileDialog.exec())
+    if(fileDialog.exec())// открываем диалоговое окно
     {
-        filePath = fileDialog.selectedFiles().first();
+        filePath = fileDialog.selectedFiles().first();// получаем первый выбранный путь
 
-        tableView->setRootIndex(fileModel->setRootPath(filePath));
+        tableView->setRootIndex(fileModel->setRootPath(filePath));// устанавливаем этот путь для таблицы
     }
 }
 
-MainWindow::~MainWindow()
-{
-
-}
 

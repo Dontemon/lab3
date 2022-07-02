@@ -10,7 +10,7 @@ DataList Reader_SQL_lite::read_Data(const QString& filePath)
     sql_Data_Base.setDatabaseName(filePath);//указываем адрес файла
     if (sql_Data_Base.open())//если бд открывается
     {
-        QString data_Base_Name = filePath.mid(filePath.lastIndexOf('/')+1,filePath.indexOf('.') - filePath.lastIndexOf('/') - 1);//получаем название базы данных
+        QString data_Base_Name = filePath.mid(filePath.lastIndexOf('/') + 1, filePath.indexOf('.') - filePath.lastIndexOf('/') - 1);//получаем название базы данных
         QSqlQuery query("SELECT VALUE, TIME FROM " + data_Base_Name, sql_Data_Base);//создаём запрос
 
         for (int i = 0;query.next() && i < 10; i++)
@@ -20,6 +20,19 @@ DataList Reader_SQL_lite::read_Data(const QString& filePath)
             data_List << Data(value, query.value(1).toString());//заполняем данными из бд
         }
 
+        if (data_List.isEmpty())//если файл пустой выдаём ошибку
+        {
+            QMessageBox messageBox;
+            messageBox.setText("Данные не найдены, график пустой: " + filePath);
+            messageBox.exec();
+        }
+
+    }
+    else
+    {
+        QMessageBox messageBox;//если файл не открывается, то выдаём ошибку
+        messageBox.setText("Ошибка открытия " + filePath);
+        messageBox.exec();
     }
 
     return data_List;
@@ -38,29 +51,69 @@ DataList Reader_JSON::read_Data(const QString& filePath)
         QJsonDocument document = QJsonDocument::fromJson(val.toUtf8());//создаём документ для считывания с json формата
 
         if (document.isArray())
-        {       
+        {
             QJsonArray array = document.array();//получаем json массив 
 
-            int index = 0;
-            foreach (const QJsonValue & value, array)//цикл считывания данных
+            bool partDataNotFound = false;
+
+            for (int index = 0; index < 10; index++)//цикл считывания данных
             {
-                if (value.isObject())
+                if (array[index].isObject())
                 {
-                    QJsonObject obj = value.toObject();
-                    double val = obj["Value"].toDouble();//получаем данные из элемента массива
-                    QString time = obj["Time"].toString();
+                    QJsonObject obj = array[index].toObject();
 
-                    QPointF point(index, val);
-                    data_List << Data(point, time);//заполняем данными список
+                    if (obj.contains("Value") && obj.contains("Time"))
+                    {
+                        double val = obj["Value"].toDouble();//получаем данные из элемента массива
+                        QString time = obj["Time"].toString();
 
-                    index++;
+                        QPointF point(index, val);
+                        data_List << Data(point, time);//заполняем данными список
+                    }
+                    else//если не найдена Value или Time
+                    {
+                        QPointF point(index, 0);
+                        data_List << Data(point, "not found");
+
+                        partDataNotFound = true;
+                    }
+
+
                 }
-                if (index >= 10)
-                    break;
             }
+
+            if (partDataNotFound)//если часть данных отсутствует, то выдаём ошибку
+            {
+                QMessageBox messageBox;
+                messageBox.setText("Часть данных не найдена: " + filePath);
+                messageBox.exec();
+            }
+
+            if (data_List.isEmpty())//если файл пустой, то выдаём ошибку
+            {
+                QMessageBox messageBox;
+                messageBox.setText("Данные не найдены, график пустой: " + filePath);
+                messageBox.exec();
+            }
+
+
         }
+        else//если файл json сформирован не как массив, то выдаём ошибку
+        {
+            QMessageBox messageBox;
+            messageBox.setText("Не найден json-массив в: " + filePath);
+            messageBox.exec();
+        }
+        file.close();
+    }
+    else//если файл не открывается, то выдаём ошибку
+    {
+        QMessageBox messageBox;
+        messageBox.setText("Ошибка открытия " + filePath);
+        messageBox.exec();
     }
 
-    file.close();
+
+
     return data_List;
 }

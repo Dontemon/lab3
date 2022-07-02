@@ -13,20 +13,18 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private slots:
-    void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
-    void openFileDialogWindow();
+    void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);//слот который вызывается когда в таблице выбирается файл
+    void openFileDialogWindow();//функция открывающая диалоговое окно для выбора файла
 
 public:
     MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 private:
     QFileSystemModel *fileModel;
-    QTableView  *tableView;
-    ChartWidget *chartWidget;
-    QVBoxLayout *tableLayout;
-    QHBoxLayout *tableButtonLayout;
+    QTableView  *tableView;//таблица файлов в окне
+    ChartWidget *chartWidget;//диаграмма в окне
+    QVBoxLayout *tableLayout;//слой для таблицы
 
-    QPushButton *buttonChangeFolder;
+    QPushButton *buttonChangeFolder;// кнопка выбора файла для диаграммы
 };
 
 #endif // MAINWINDOW_H

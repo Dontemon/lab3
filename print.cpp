@@ -14,11 +14,11 @@ void Print_Bar::create_Chart(QChartView& chart_View, const DataList& data, bool 
 
     if (blackAndWhite)//если нужно сделать график черно белым
     {
-        QLinearGradient gradient(0, 0, 1000, 1000);
+        QLinearGradient gradient(0, 0, 1000, 1000);//создаём градиент от чёрного к белому
         gradient.setColorAt(0, Qt::black);
         gradient.setColorAt(1, Qt::white);
 
-        QBrush brush(gradient);
+        QBrush brush(gradient);//раскрашиваем диаграмму в чёрно-белый цвет
         set->setBrush(brush);
     }
     series->append(set);//добавляем в series set
@@ -34,18 +34,18 @@ void Print_Pie::create_Chart(QChartView& chart_View, const DataList& data, bool 
     QChart *chart = new QChart();//создаем диаграмму
     chart->setTitle("Pie chart");//называем диаграмму
 
-    QPieSeries *series = new QPieSeries(chart);
+    QPieSeries *series = new QPieSeries(chart);//создаём переменную для заполнение круговой диаграммы
         for (const Data &data_Elem : data)
         {
             QPieSlice *slice = series->append(data_Elem.second, data_Elem.first.y());//заполняем данными из бд
 
             if (blackAndWhite)//если чёрно-белый график
             {
-                QLinearGradient gradient(0, 0, 1000, 1000);
+                QLinearGradient gradient(0, 0, 1000, 1000);//создаём градиент от чёрного к белому
                 gradient.setColorAt(0, Qt::black);
                 gradient.setColorAt(1, Qt::white);
 
-                QBrush brush(gradient);
+                QBrush brush(gradient);//раскрашиваем диаграмму в чёрно-белый цвет
                 slice->setBrush(brush);
             }
         }

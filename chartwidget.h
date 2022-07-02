@@ -58,24 +58,24 @@ class ChartWidget: public QWidget
 {
     Q_OBJECT
 public:
-    explicit ChartWidget(QWidget *parent = nullptr);
+     ChartWidget(QWidget *parent = nullptr);
     ~ChartWidget();//деструктор
 
-    void updateData(const QString& filePath);
+    void updateData(const QString& filePath);//функия для записи новых данных(при переключении с одной базы данных на другую)
 
 private Q_SLOTS:
     void updateUI();
-    void printToPdf();
+    void printToPdf();// функция, которая создаёт .pdf файл с диаграммой
 
 private:
-    QComboBox *createTypeBox() const;
+    QComboBox *createTypeBox() const;//создаём кнопку выбора диаграммы
     void connectSignals();
 
-    QString getPathToSavePdf();
+    QString getPathToSavePdf();//функция которая возвращает путь до выбранного файла
 
-    QComboBox *typeComboBox;
-    QCheckBox *blackAndWhiteCheckBox;
-    QPushButton *printButton;
+    QComboBox *typeComboBox;//кнопка выбора диаграммы
+    QCheckBox *blackAndWhiteCheckBox;//чекбокс для выбора цвета графика
+    QPushButton *printButton;//кнопка для создания .pdf файл с диаграммой
 
     Chart *chart;
 };
